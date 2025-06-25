@@ -71,7 +71,7 @@ jobs:
 
       - name: Output report URL
         run: |
-          echo "✅ Deployed: https://alexisrodriguezcs.github.io/test-repo/${{ github.event.client_payload.service }}/"
+          echo "✅✅ Deployed: https://alexisrodriguezcs.github.io/test-repo/${{ github.event.client_payload.service }}/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

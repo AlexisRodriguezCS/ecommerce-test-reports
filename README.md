@@ -68,7 +68,7 @@ Each service's reports are organized like:
     - [ecommerce-config-server](https://github.com/AlexisRodriguezCS/ecommerce-config-server) — Centralized configuration service (this repo)
     - [ecommerce-discovery-server](https://github.com/AlexisRodriguezCS/ecommerce-discovery-server) — Eureka-based service registry
     - [ecommerce-api-gateway](https://github.com/AlexisRodriguezCS/ecommerce-api-gateway) — API gateway with routing, JWT validation, and rate limiting
-    - [ecommerce-test-reports](https://github.com/AlexisRodriguezCS/ecommerce-test-reports) — GitHub Pages deployment of HTML test, code coverage, and security reports for each microservice
+    - [ecommerce-test-reports](https://github.com/AlexisRodriguezCS/ecommerce-test-reports) — GitHub Pages for test, coverage, and security reports per service
 
 - **Microservices**
     - [ecommerce-auth-service](https://github.com/AlexisRodriguezCS/ecommerce-auth-service) — User authentication and JWT management
