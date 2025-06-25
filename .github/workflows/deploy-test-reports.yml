@@ -1,0 +1,80 @@
+name: Deploy Test Reports
+
+on:
+  repository_dispatch:
+    types: [trigger-report-deploy]
+
+jobs:
+  deploy-reports:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-reports-${{ github.event.client_payload.service }}
+      cancel-in-progress: true
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js (for GitHub Pages)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Download Test Reports Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.event.client_payload.service }}-test-reports
+          path: ./reports/test
+        continue-on-error: true
+
+      - name: Download Coverage Reports Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.event.client_payload.service }}-coverage-reports
+          path: ./reports/coverage
+        continue-on-error: true
+
+      - name: Download Security Reports Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.event.client_payload.service }}-security-reports
+          path: ./reports/security
+        continue-on-error: true
+
+      - name: Create folders in public directory
+        run: |
+          mkdir -p ./public/${{ github.event.client_payload.service }}/test
+          mkdir -p ./public/${{ github.event.client_payload.service }}/coverage
+          mkdir -p ./public/${{ github.event.client_payload.service }}/security
+
+      - name: Copy test reports to public folder
+        run: cp -r ./reports/test/* ./public/${{ github.event.client_payload.service }}/test/ || echo "No test reports"
+
+      - name: Copy coverage reports to public folder
+        run: cp -r ./reports/coverage/* ./public/${{ github.event.client_payload.service }}/coverage/ || echo "No coverage reports"
+
+      - name: Copy security report to public folder
+        run: |
+          # dependency-check outputs an HTML file; rename to index.html for GitHub Pages
+          cp ./reports/security/dependency-check-report.html ./public/${{ github.event.client_payload.service }}/security/index.html || echo "No security report found"
+
+      - name: Add .nojekyll file
+        run: touch ./public/.nojekyll
+
+      - name: Commit and push updated reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/${{ github.event.client_payload.service }}/
+          git commit -m "Update reports for ${{ github.event.client_payload.service }} run ${{ github.event.run_id }}" || echo "No changes to commit"
+          git push
+
+      - name: Output report URL
+        run: |
+          echo "✅ Deployed: https://alexisrodriguezcs.github.io/test-repo/${{ github.event.client_payload.service }}/"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
